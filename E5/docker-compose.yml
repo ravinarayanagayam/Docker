@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  mongodb:
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+    environment:
+      - MONGODB_USERNAME=max
+      - MONGODB_PASSWORD=secret
+    container_name: mongodb
+  backend:
+    build: ./backend
+    ports:
+      - '80:80'
+    volumes:
+      - logs:/apps/logs
+      - ./backend:/app
+      - /app/node_modules  
+    environment:
+      - MONGODB_USERNAME=max
+      - MONGODB_PASSWORD=secret
+    depends_on:
+      - mongodb
+    container_name: backend
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+    container_name: frontend
+volumes:
+  data:
+  logs:
